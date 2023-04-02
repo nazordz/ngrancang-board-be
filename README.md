@@ -1,0 +1,1 @@
+-Dflyway.url=jdbc:postgresql://localhost:5433/ngrancang -Dflyway.user=nazordz -Dflyway.password=adb3l1cak

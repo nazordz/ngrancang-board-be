@@ -1,0 +1,30 @@
+package com.unindra.ngrancang.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.unindra.ngrancang.model.Role;
+import com.unindra.ngrancang.repository.RoleRepository;
+
+import lombok.extern.slf4j.Slf4j;
+
+
+@RestController
+@RequestMapping(path = "/api/role")
+@Slf4j
+public class RoleController {
+
+    @Autowired
+    private RoleRepository roleRepository;
+    
+    @GetMapping
+    public ResponseEntity<List<Role>> get() {
+        log.debug("lol: {}", roleRepository.findAll()) ;
+        return ResponseEntity.ok(roleRepository.findAll());
+    }
+}
