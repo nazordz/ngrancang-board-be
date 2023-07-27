@@ -1,4 +1,4 @@
-package com.unindra.ngrancang.dto;
+package com.unindra.ngrancang.dto.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

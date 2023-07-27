@@ -2,6 +2,7 @@ package com.unindra.ngrancang.jwt;
 
 import java.io.IOException;
 
+import org.hibernate.tool.schema.spi.SqlScriptException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,6 +11,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.persistence.PersistenceException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,11 +43,14 @@ public class AuthTokenFilter extends OncePerRequestFilter{
 				
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
-		} catch (Exception e) {
-			log.error("Cannot set user authentication: {}", e);
+		} 
+		catch (ExpiredJwtException e) {
+			log.error("Token expired");
+			request.setAttribute("expired", e.getMessage());
+		} 
+		finally {
+			filterChain.doFilter(request, response);
 		}
-
-		filterChain.doFilter(request, response);
 	}
 
 	private String parseJwt(HttpServletRequest request) {

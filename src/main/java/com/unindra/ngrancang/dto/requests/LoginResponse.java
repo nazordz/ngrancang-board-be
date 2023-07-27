@@ -1,4 +1,4 @@
-package com.unindra.ngrancang.dto;
+package com.unindra.ngrancang.dto.requests;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

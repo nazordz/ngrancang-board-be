@@ -1,4 +1,4 @@
-package com.unindra.ngrancang.dto;
+package com.unindra.ngrancang.dto.requests;
 
 import lombok.Data;
 

@@ -7,17 +7,20 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.unindra.ngrancang.dto.LoginRequest;
-import com.unindra.ngrancang.dto.LoginResponse;
-import com.unindra.ngrancang.dto.MessageResponse;
-import com.unindra.ngrancang.dto.RegisterRequest;
+import com.unindra.ngrancang.dto.requests.LoginRequest;
+import com.unindra.ngrancang.dto.requests.LoginResponse;
+import com.unindra.ngrancang.dto.requests.RefreshRequest;
+import com.unindra.ngrancang.dto.requests.RegisterRequest;
+import com.unindra.ngrancang.dto.responses.MessageResponse;
 import com.unindra.ngrancang.jwt.JwtUtils;
+import com.unindra.ngrancang.jwt.UserDetailsServiceImpl;
 import com.unindra.ngrancang.model.User;
 import com.unindra.ngrancang.model.UserRole;
 import com.unindra.ngrancang.repository.RoleRepository;
@@ -29,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping(path = "/api/auth")
 @Slf4j
+// @CrossOrigin
 public class AuthController {
     @Autowired
 	PasswordEncoder encoder;
@@ -50,6 +54,9 @@ public class AuthController {
 
     @Autowired
     UserRoleRepository userRoleRepository;
+
+    @Autowired
+	private UserDetailsServiceImpl userDetailsService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> login(
@@ -106,5 +113,32 @@ public class AuthController {
                         .body(new MessageResponse("Error: " + e.getMessage()));
         }
         
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@Valid @RequestBody RefreshRequest refreshRequest) {
+        try {
+            boolean isvalid = jwtUtils.validateJwtToken(refreshRequest.getToken());
+            if (isvalid) {
+                String username = jwtUtils.getUserNameFromJwtToken(refreshRequest.getToken());
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+						userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                String jwt = jwtUtils.generateJwtToken(authentication);
+                String refresh = jwtUtils.generateRefreshToken(authentication);
+                
+                LoginResponse res = new LoginResponse(
+                    jwt, refresh, "Bearer", jwtExpirationMs
+                );
+                return ResponseEntity.ok(res);
+            } else {
+                throw new Exception("Refresh token isn't valid");
+            }
+        } catch (Exception e) {
+            return ResponseEntity
+                        .badRequest()
+                        .body(new MessageResponse("Error: " + e.getMessage()));
+        }
     }
 }

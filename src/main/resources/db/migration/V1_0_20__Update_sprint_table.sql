@@ -1,0 +1,3 @@
+ALTER TABLE sprints 
+ALTER COLUMN is_running DROP NOT NULL,
+ALTER COLUMN is_running DROP DEFAULT;

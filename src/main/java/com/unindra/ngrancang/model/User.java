@@ -27,6 +27,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import lombok.Data;
@@ -58,7 +59,7 @@ public class User implements UserDetails {
     private String phone;
 
     @Column
-    @JsonIgnore
+    // @JsonIgnore
     private String password;
 
     @Override
@@ -86,8 +87,17 @@ public class User implements UserDetails {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    @JsonManagedReference
     private List<Role> roles = new ArrayList<Role>();
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<Project> projects;
+
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL )
+    // private Set<Issue> issues;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Epic> epics;
 
     @Override
     public String getUsername() {

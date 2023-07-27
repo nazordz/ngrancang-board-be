@@ -1,4 +1,4 @@
-package com.unindra.ngrancang.dto;
+package com.unindra.ngrancang.dto.requests;
 
 import org.springframework.format.annotation.NumberFormat;
 
@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RegisterRequest {
-@NotEmpty
+    @NotEmpty
     private String name;
     
     @NotEmpty
