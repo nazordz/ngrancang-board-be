@@ -87,7 +87,7 @@ public class ProjectController {
             project.setAvatar(null);
 
         }
-        project.setUser(userService.currentUser());
+        project.setUserId(userService.currentUser().getId());
         project.setDescription(projectRequest.getDescription());
         Project savedProject = projectRepository.save(project);
         return modelMapper.map(savedProject, ProjectResponse.class);

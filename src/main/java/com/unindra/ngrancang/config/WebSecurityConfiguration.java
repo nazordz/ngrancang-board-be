@@ -72,7 +72,7 @@ public class WebSecurityConfiguration{
             auth.requestMatchers("/assets/**").permitAll();
             auth.requestMatchers("/api/auth/**").permitAll();
             auth.requestMatchers("/api/role/**").permitAll();
-            auth.requestMatchers("/api/user/**").authenticated();
+            auth.requestMatchers("/api/users/**").authenticated();
             auth.requestMatchers("/api/epics/**").authenticated();
             auth.requestMatchers("/api/projects/**").authenticated();
             auth.requestMatchers("/api/sprints/**").authenticated();
