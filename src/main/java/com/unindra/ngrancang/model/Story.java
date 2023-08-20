@@ -99,6 +99,9 @@ public class Story{
     @Column(columnDefinition = "json")
     private List<String> attachments;
 
+    @OneToMany(mappedBy = "story")
+    private List<ActiveSprintLog> activeSprintLogs;
+
     @Column
     private String description;
 

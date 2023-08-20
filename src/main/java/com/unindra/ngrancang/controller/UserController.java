@@ -11,8 +11,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +28,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.unindra.ngrancang.dto.requests.RegisterRequest;
 import com.unindra.ngrancang.dto.requests.UpdateUserProfileRequest;
+import com.unindra.ngrancang.dto.requests.UpdateUserRequest;
 import com.unindra.ngrancang.dto.requests.UpdateUserStatusRequest;
+import com.unindra.ngrancang.dto.responses.MessageResponse;
 import com.unindra.ngrancang.dto.responses.RoleResponse;
 import com.unindra.ngrancang.dto.responses.UserResponse;
 import com.unindra.ngrancang.jwt.UserDetailsServiceImpl;
@@ -128,6 +132,40 @@ public class UserController {
         }
         User updatedUser = userRepository.save(user);
         UserResponse response = modelMapper.map(updatedUser, UserResponse.class);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getById(@PathVariable("id") UUID id) {
+        User user = userRepository.findById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
+        UserResponse response = modelMapper.map(user, UserResponse.class);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserResponse> update(
+        @PathVariable("id") UUID id,
+        @RequestBody UpdateUserRequest request
+    ) {
+        User user = userRepository.findById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
+        user.setEmail(request.getEmail());
+        user.setName(request.getName());
+        user.setPhone(request.getPhone());
+        user.setPosition(request.getPosition());
+
+        User updatedUser = userRepository.save(user);
+        UserResponse response = modelMapper.map(updatedUser, UserResponse.class);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<MessageResponse> deleteById(@PathVariable("id") UUID id) {
+        userRepository.deleteById(id);
+        MessageResponse response = new MessageResponse("Berhasil dihapus!");
         return ResponseEntity.ok(response);
     }
 }

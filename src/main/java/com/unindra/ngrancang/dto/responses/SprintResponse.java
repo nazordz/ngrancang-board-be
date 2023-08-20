@@ -47,6 +47,10 @@ public class SprintResponse {
     private Date actualEndDate;
     
     private List<StoryResponse> stories = new ArrayList<>();
+
+    private Integer planStoryPoint;
+
+    private Integer actualStoryPoint;
     
     private Timestamp createdAt;
 

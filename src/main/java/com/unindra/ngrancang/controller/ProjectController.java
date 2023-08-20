@@ -117,7 +117,7 @@ public class ProjectController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponse> deleteProject(@PathVariable UUID id) {
-        projectRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
+        // projectRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
         projectRepository.deleteById(id);
         return ResponseEntity.ok(new MessageResponse("Project has been deleted"));
     }

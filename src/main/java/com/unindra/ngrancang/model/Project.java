@@ -12,7 +12,6 @@ import org.hibernate.annotations.Where;
 import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -30,7 +29,7 @@ import lombok.Data;
 @Entity
 @Table(name = "projects")
 @Data
-@SQLDelete(sql = "UPDATE users SET deleted_at = NOW() WHERE id = ?")
+@SQLDelete(sql = "UPDATE projects SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = "deleted_at IS NULL")
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Project {

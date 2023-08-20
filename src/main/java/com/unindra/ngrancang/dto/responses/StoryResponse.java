@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.unindra.ngrancang.enumeration.IssuePriority;
 import com.unindra.ngrancang.enumeration.IssueStatus;
+import com.unindra.ngrancang.model.ActiveSprintLog;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -66,6 +67,8 @@ public class StoryResponse {
     private int sequence;
 
     private List<SubTaskResponse> subTasks = new ArrayList<>();
+
+    private List<ActiveSprintLogResponse> activeSprintLogs = new ArrayList<>();
 
     private Timestamp createdAt;
 

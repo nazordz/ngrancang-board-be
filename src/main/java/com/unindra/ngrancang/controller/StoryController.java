@@ -31,6 +31,7 @@ import com.unindra.ngrancang.dto.requests.ListStorySequenceRequest;
 import com.unindra.ngrancang.dto.requests.UpdateStoryRequest;
 import com.unindra.ngrancang.dto.requests.UpdateStorySequenceInActiveSprintRequest;
 import com.unindra.ngrancang.dto.requests.UpdateStorySequenceRequest;
+import com.unindra.ngrancang.dto.responses.EpicResponse;
 import com.unindra.ngrancang.dto.responses.MessageResponse;
 import com.unindra.ngrancang.dto.responses.StoryResponse;
 import com.unindra.ngrancang.dto.responses.SubTaskResponse;
@@ -38,7 +39,9 @@ import com.unindra.ngrancang.dto.responses.UserResponse;
 import com.unindra.ngrancang.enumeration.IssuePriority;
 import com.unindra.ngrancang.enumeration.IssueStatus;
 import com.unindra.ngrancang.jwt.UserDetailsServiceImpl;
+import com.unindra.ngrancang.model.ActiveSprintLog;
 import com.unindra.ngrancang.model.Story;
+import com.unindra.ngrancang.repository.ActiveSprintLogRepository;
 import com.unindra.ngrancang.repository.ProjectRepository;
 import com.unindra.ngrancang.repository.StoryRepository;
 
@@ -59,6 +62,9 @@ public class StoryController {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private ActiveSprintLogRepository activeSprintLogRepository;
     
     @GetMapping
     public Page<Story> storyPaginate(
@@ -96,6 +102,9 @@ public class StoryController {
         // }).toList();
         List<StoryResponse> storiesResponses = stories.stream().map(story -> {
             StoryResponse res = modelMapper.map(story, StoryResponse.class);
+            if (story.getEpic() != null) {
+                res.setEpic(modelMapper.map(story.getEpic(), EpicResponse.class));
+            }
             return res;
         }).toList();
         return ResponseEntity.ok(storiesResponses);
@@ -151,17 +160,17 @@ public class StoryController {
         Story story = storyRepository.findById(id)  
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "story with id "+id+" not found"));
         modelMapper.map(request, story);
-        // Story updateData = modelMapper.map(request, Story.class);
-        // updateData.setId(story.getId());
-        // story.setAssigneeId(request.getAssigneeId());
-        // story.setDescription(request.getDescription());
-        // story.setEpicId(request.getEpicId());
-        // story.setPriority(request.getPriority());
-        // story.setSprintId(request.getSprint());
-        // story.setStatus(request.getStatus());
-        // story.setSummary(request.getSummary());
-        // story.setStoryPoint(request.getStoryPoint());
         Story newStory = storyRepository.save(story);
+
+        if (story.getSprint().getIsRunning() && (request.getStatus() != story.getStatus() || request.getStoryPoint() != story.getStoryPoint())) {
+            ActiveSprintLog activeSprintLog = new ActiveSprintLog();
+            activeSprintLog.setStoryId(id);
+            activeSprintLog.setSprintId(newStory.getSprintId());
+            activeSprintLog.setStatus(request.getStatus());
+            activeSprintLog.setStoryPoint(request.getStoryPoint());
+            activeSprintLogRepository.save(activeSprintLog);
+        }
+        
         StoryResponse response = modelMapper.map(newStory, StoryResponse.class);
         return response;
     }

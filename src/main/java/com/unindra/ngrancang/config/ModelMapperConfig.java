@@ -26,6 +26,7 @@ import com.unindra.ngrancang.model.Story;
 import com.unindra.ngrancang.model.SubTask;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -44,9 +45,20 @@ public class ModelMapperConfig {
 
             return modelMapper.map(source, EpicResponse.class);
         };
+        Converter<Story, StoryResponse> toStoryGetEpicResponse = context -> {
+            Story source = context.getSource();
+            if (source.getEpic() == null) return null;
+            return modelMapper.map(source, StoryResponse.class);
+        };
 
-        Condition<Story, StoryResponse> isEpicCalled = context -> context.getSource().getEpic() != null;
-
+        Condition<Story, StoryResponse> isEpicCalled = context -> {
+            return context.getSource().getEpic() != null;
+        };
+        
+        // modelMapper.when(isEpicCalled)
+        //     .map(src -> src.getEpic(), (dest, value) -> dest.setEpic(modelMapper.map(value, EpicResponse.class)))
+        //     .skip();
+        Condition<Story, Boolean> isEpicNotNull = context -> context.getSource().getEpic() != null;
         PropertyMap<Story, StoryResponse> storyMap = new PropertyMap<Story, StoryResponse>() {
             
             @Override
@@ -64,11 +76,10 @@ public class ModelMapperConfig {
                 // }
             
                 skip().setProject(null);
-
-                // Condition<Story, StoryResponse> isEpicCalled = context -> context.getSource().getEpic() != null;
                 skip().setEpic(null);
-                // when(isEpicCalled).using(toEpicResponse).;
-                // when(isEpicCalled).using(toEpicResponse).map(source.getEpic(), StoryResponse::setEpic);
+
+                // skip().setActiveSprintLogs(new ArrayList<>());
+                // when(isEpicNotNull).using(toEpicResponse);
 
                 // map().setUser(null);
                 // map().setAssignee(null);

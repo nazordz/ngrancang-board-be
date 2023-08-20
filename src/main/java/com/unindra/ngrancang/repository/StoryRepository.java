@@ -12,18 +12,18 @@ import org.springframework.data.repository.query.Param;
 import com.unindra.ngrancang.model.Story;
 
 public interface StoryRepository extends JpaRepository<Story, UUID>{
-    @EntityGraph(attributePaths = {"user", "sprint", "assignee"})
+    @EntityGraph(attributePaths = {"user", "sprint", "assignee", "epic"})
     @Query("SELECT s FROM Story s WHERE s.projectId = ?1 ORDER BY s.sequence")
     List<Story> findByProjectIdOrderBySequenceAsc(UUID projectId);
 
-    @EntityGraph(attributePaths = {"user", "assignee"})
+    @EntityGraph(attributePaths = {"user", "assignee", "epic"})
     List<Story> findByProjectIdAndSprintIdIsNullOrderBySequenceAsc(UUID projectId);
 
-    @EntityGraph(attributePaths = {"user", "sprint", "assignee"})
+    @EntityGraph(attributePaths = {"user", "sprint", "assignee", "epic"})
     @Query("SELECT s FROM Story s WHERE s.projectId = ?1 AND s.sprintId = ?2 ORDER BY s.sequence")
     List<Story> findByProjectIdAndSprintIdOrderBySequenceAsc(UUID projectId, UUID sprintId);
 
-    @EntityGraph(attributePaths = {"user", "sprint", "assignee"})
+    @EntityGraph(attributePaths = {"user", "sprint", "assignee", "epic"})
     @Query("SELECT s FROM Story s WHERE s.projectId = ?1 AND s.epicId = ?2 ORDER BY s.sequence")
     List<Story> findByProjectIdAndEpicIdOrderBySequenceAsc(UUID projectId, UUID epicId);
 

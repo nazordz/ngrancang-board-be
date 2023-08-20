@@ -10,6 +10,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
+import org.modelmapper.internal.bytebuddy.dynamic.TypeResolutionStrategy.Active;
 import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -23,6 +24,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -71,10 +73,20 @@ public class Sprint {
     private Date endDate;
     
     @OneToMany(mappedBy = "sprint", targetEntity = Story.class, fetch = FetchType.LAZY)
+    @OrderBy("sequence asc")
     private List<Story> stories;
+
+    @OneToMany(mappedBy = "sprint")
+    private List<ActiveSprintLog> activeSprintLogs;
 
     @Column(nullable = false)
     private int sequence;
+    
+    @Column(name = "plan_story_point")
+    private Integer planStoryPoint;
+    
+    @Column(name = "actual_story_point")
+    private Integer actualStoryPoint;
 
     @Column(nullable = false, name = "is_running")
     private boolean isRunning;
@@ -87,12 +99,12 @@ public class Sprint {
     }
     
     @Column(name = "actual_start_date")
-    @Temporal(TemporalType.DATE)
-    private Date actualStartDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Timestamp actualStartDate;
 
     @Column(name = "actual_end_date")
-    @Temporal(TemporalType.DATE)
-    private Date actualEndDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Timestamp actualEndDate;
 
     @Column(name = "created_at")
     @CreationTimestamp

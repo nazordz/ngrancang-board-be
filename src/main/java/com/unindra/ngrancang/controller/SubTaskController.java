@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +24,7 @@ import com.unindra.ngrancang.dto.requests.CreateSubTasksSimpleRequest;
 import com.unindra.ngrancang.dto.requests.ListSubTaskSequenceRequest;
 import com.unindra.ngrancang.dto.requests.UpdateSubTasksSequence;
 import com.unindra.ngrancang.dto.requests.UpdateSubTasksSimpleRequest;
+import com.unindra.ngrancang.dto.responses.SubTaskResponse;
 import com.unindra.ngrancang.enumeration.IssueStatus;
 import com.unindra.ngrancang.model.Story;
 import com.unindra.ngrancang.model.SubTask;
@@ -41,6 +44,9 @@ public class SubTaskController {
 
     @Autowired
     private StoryRepository storyRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
     
     @GetMapping
     public Page<SubTask> getSubTask(
@@ -59,7 +65,7 @@ public class SubTaskController {
     }
 
     @PostMapping("/store-simple")
-    public SubTask storeSimpleSubTask(@RequestBody CreateSubTasksSimpleRequest request) {
+    public ResponseEntity<SubTaskResponse> storeSimpleSubTask(@RequestBody CreateSubTasksSimpleRequest request) {
         Story selectedStory = storyRepository.findById(request.getStoryId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "story with id "+request.getStoryId()+" not found"));
         int totalSubTask = subTaskRepository.countByStoryId(request.getStoryId()).intValue() + 1;
@@ -71,20 +77,24 @@ public class SubTaskController {
         subtask.setKey(selectedStory.getKey()+"-"+"TASK"+totalSubTask);
         subtask.setStatus(IssueStatus.TODO);
         
-        return subTaskRepository.save(subtask);
+        SubTask updatedSubTask = subTaskRepository.save(subtask);
+        SubTaskResponse response = modelMapper.map(updatedSubTask, SubTaskResponse.class);
+        return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/update-description/{id}")
-    public SubTask updateDescriptionSubTask(@PathVariable("id") UUID id, @RequestBody UpdateSubTasksSimpleRequest request) {
+    @PatchMapping("/{id}/description")
+    public ResponseEntity<SubTaskResponse> updateDescriptionSubTask(@PathVariable("id") UUID id, @RequestBody UpdateSubTasksSimpleRequest request) {
         SubTask subtask = subTaskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "sub task with id "+id+" not found"));
         subtask.setDescription(request.getDescription());
 
-        return subTaskRepository.save(subtask);
+        SubTask updatedSubTask = subTaskRepository.save(subtask);
+        SubTaskResponse response = modelMapper.map(updatedSubTask, SubTaskResponse.class);
+        return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/update-assignee/{subtask_id}")
-    public SubTask updateAssigneeSubTask(
+    @PatchMapping("/{subtask_id}/assignee")
+    public ResponseEntity<SubTaskResponse> updateAssigneeSubTask(
         @PathVariable("subtask_id") UUID subtaskId,
         @RequestBody UpdateSubTasksSimpleRequest request
     ) {
@@ -92,7 +102,22 @@ public class SubTaskController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "sub task with id "+subtaskId+" not found"));
         subtask.setAssigneeId(request.getAssigneeId());
 
-        return subTaskRepository.save(subtask);
+        SubTask updatedSubTask = subTaskRepository.save(subtask);
+        SubTaskResponse response = modelMapper.map(updatedSubTask, SubTaskResponse.class);
+        return ResponseEntity.ok(response);
+    }
+    @PatchMapping("/{subtask_id}/status")
+    public ResponseEntity<SubTaskResponse> updateStatusSubTask(
+        @PathVariable("subtask_id") UUID subtaskId,
+        @RequestBody UpdateSubTasksSimpleRequest request
+    ) {
+        SubTask subtask = subTaskRepository.findById(subtaskId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "sub task with id "+subtaskId+" not found"));
+        subtask.setStatus(request.getStatus());
+
+        SubTask updatedSubTask = subTaskRepository.save(subtask);
+        SubTaskResponse response = modelMapper.map(updatedSubTask, SubTaskResponse.class);
+        return ResponseEntity.ok(response);
     }
     
     @PutMapping("/update-list-subtask")
