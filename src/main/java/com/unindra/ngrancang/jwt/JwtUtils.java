@@ -45,7 +45,6 @@ public class JwtUtils {
 		UserResponse userResponse = modelMapper.map(userPrincipal, UserResponse.class);
 
 		userResponse.setRoles(modelMapper.map(userPrincipal.getRoles(), new TypeToken<List<RoleResponse>>() {}.getType()));
-		// userResponse.setRoles(userPrincipal.getRoles().stream().map(role -> modelMapper.map(role, RoleResponse.class)).toList());
 		
 		return Jwts.builder()
                 .setId(userPrincipal.getId().toString())

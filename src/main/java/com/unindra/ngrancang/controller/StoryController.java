@@ -93,13 +93,6 @@ public class StoryController {
         } else {
             stories = storyRepository.findByProjectIdOrderBySequenceAsc(projectId);
         }
-        // List<StoryResponse> storiesResponses = stories.stream().map(story -> {
-        //     StoryResponse res = modelMapper.map(story, StoryResponse.class);
-        //     res.setSubTasks(
-        //         story.getSubTasks().stream().map(st -> modelMapper.map(st, SubTaskResponse.class)).toList()
-        //     );
-        //     return res;
-        // }).toList();
         List<StoryResponse> storiesResponses = stories.stream().map(story -> {
             StoryResponse res = modelMapper.map(story, StoryResponse.class);
             if (story.getEpic() != null) {

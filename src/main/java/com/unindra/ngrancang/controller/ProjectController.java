@@ -75,11 +75,9 @@ public class ProjectController {
         project.setName(projectRequest.getName());
         if (projectRequest.getAvatar() != null && !projectRequest.getAvatar().isEmpty()) {
             try {
-                // String fileName = projectRequest.getAvatar().getOriginalFilename();
                 String fileName = storageService.save(projectRequest.getAvatar());
                 project.setAvatar("assets/"+fileName);
             } catch (RuntimeException e) {
-                // e.printStackTrace(System.out);
                 log.error("Failed to upload avatar", e);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "failed to upload avatar");
             }
@@ -101,7 +99,6 @@ public class ProjectController {
         project.setName(projectRequest.getName());
         if (!projectRequest.getAvatar().isEmpty()) {
             try {
-                // String fileName = projectRequest.getAvatar().getOriginalFilename();
                 String fileName = storageService.save(projectRequest.getAvatar());
 
                 project.setAvatar("assets/"+fileName);
@@ -117,7 +114,6 @@ public class ProjectController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponse> deleteProject(@PathVariable UUID id) {
-        // projectRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
         projectRepository.deleteById(id);
         return ResponseEntity.ok(new MessageResponse("Project has been deleted"));
     }

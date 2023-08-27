@@ -130,8 +130,6 @@ public class SubTaskController {
             subTaskRepository.save(st);
             savedSubtasks.add(st);
         });
-
         return savedSubtasks;
     }
-    
 }

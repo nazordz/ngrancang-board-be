@@ -2,13 +2,10 @@ package com.unindra.ngrancang.controller;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.unindra.ngrancang.dto.requests.CreateSprintRequest;
 import com.unindra.ngrancang.dto.responses.EpicResponse;
 import com.unindra.ngrancang.dto.responses.SprintResponse;
@@ -172,7 +168,6 @@ public class SprintController {
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sprint not found"));
         
         SprintResponse response = modelMapper.map(sprint, SprintResponse.class);
-        // List<StoryResponse> storyResponses = modelMapper.map(sprint.getStories(), new TypeToken<List<StoryResponse>>() {}.getType());
         List<StoryResponse> storyResponses = sprint.getStories().stream().map(str -> {
             StoryResponse result = modelMapper.map(str, StoryResponse.class);
             if (str.getAssignee() != null) {
